@@ -1,0 +1,28 @@
+PORT=19013
+PUBLIC_URL=http://coding.netrix.pw:19013
+ADMIN_ENABLED=0
+ADMIN_PASSWORD=elshad_686
+SESSION_SECRET=e5892b12a706aef52c68b17cb8f33b11814cc249f4ef1ebf14a09d455af8aed8
+PLUGIN_KEY=6bf82d43ff04a63bfd155f556c149b1c9c7d4a1378c002e71402608a84b72548
+
+# === ВПИШИТЕ из личного кабинета Platega (без них сайт не запустится) ===
+PLATEGA_MERCHANT_ID=
+PLATEGA_SECRET=
+
+# 2 = СБП, 10 = карты РФ, 11 = эквайринг, 12 = международные карты, 13 = крипта
+PAYMENT_METHODS=2,10,13
+
+DB_PATH=./data/shop.db
+TRUST_PROXY=0
+DEV_MODE=0
+
+# Промокоды (КОД:процент через запятую), пока пусто
+PROMO_CODES=
+
+
+# Команда выдачи токенов: {player} — ник, {qty} — число токенов (покупка любого количества от 1000, 1 ₽ = 1000 токенов).
+TOKENS_COMMAND=points give {player} {qty}
+
+# Сообщение в чат при донате (0 — выключить) и название сервера в нём
+ANNOUNCE_ENABLED=1
+ANNOUNCE_NAME=LoonTime

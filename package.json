@@ -1,0 +1,17 @@
+{
+  "name": "loontime-donate-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Сайт доната для Minecraft-сервера: витрина, админка, оплата Platega, API для плагина",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node --env-file=.env src/server.js",
+    "dev": "node --env-file=.env --watch src/server.js",
+    "test": "node --test test/flow.test.js"
+  },
+  "dependencies": {
+    "acme-client": "^5.4.0",
+    "express": "^4.21.2"
+  }
+}

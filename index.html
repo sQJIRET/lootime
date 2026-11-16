@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loontime — магазин</title>
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:title" content="Loontime — магазин">
+  <meta property="og:image" content="/banner.jpg">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <script src="/theme.js"></script>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img class="logo" src="/img/logo.png" alt=""><span id="brand">Магазин</span></a>
+    <nav>
+      <a href="/" data-nav="home"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg><span>Главная</span></a>
+      <a href="#shop" data-nav="shop"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Магазин</span></a>
+      <a href="/rules" data-nav="rules"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Правила сервера</span></a>
+      <a href="/contacts" data-nav="contacts"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Контакты</span></a>
+      <button type="button" class="theme-btn" id="themeBtn" aria-label="Сменить тему" title="Светлая / тёмная тема"><svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+    </nav>
+    <button class="cart-btn" id="cartBtn" type="button" aria-label="Корзина">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6"/></svg>
+      <span class="cart-badge" id="cartBadge" hidden>0</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <picture>
+    <source srcset="/banner.avif" type="image/avif">
+    <img class="banner-img" src="/banner.jpg" alt="Loontime" width="1672" height="941" fetchpriority="high">
+  </picture>
+
+  <section class="hero">
+    <h1 id="title">Магазин</h1>
+    <p id="tagline"></p>
+    <button type="button" class="ip-chip hero-ip" id="ip" data-ip="LoonTime.c6t.ru" title="Нажмите, чтобы скопировать IP сервера">
+      <span class="ip-label">IP:</span> <svg class="ip-ico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="ip-text">LoonTime.c6t.ru</span>
+      <span class="ip-ok">Скопировано!</span>
+    </button>
+  </section>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <section id="shop">
+    <div class="tabs" id="tabs"></div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>Товаров пока нет.</div>
+  </section>
+</main>
+
+<script src="/footer.js"></script>
+
+<div class="sheet-bg" id="sheetBg">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <div class="sheet-head">
+      <h2 id="cartTitle">Корзина</h2>
+      <button class="x" id="cartClose" type="button" aria-label="Закрыть">&times;</button>
+    </div>
+
+    <div class="sheet-body">
+      <div id="cartEmpty" class="cart-empty" hidden>
+        <div class="big">🛒</div>
+        <p>В корзине пока пусто</p>
+        <button type="button" id="toShop">Перейти к товарам</button>
+      </div>
+
+      <div id="cartFull">
+        <div id="cartItems" class="cart-items"></div>
+
+        <div class="box">
+          <div class="two">
+            <div>
+              <label for="nick">Ваш никнейм:</label>
+              <input id="nick" maxlength="17" autocomplete="off" placeholder="Например, Steve_123" spellcheck="false">
+            </div>
+            <div>
+              <label for="email">Ваш Email:</label>
+              <input id="email" type="email" autocomplete="email" placeholder="user@example.com" required>
+            </div>
+          </div>
+          <div class="hint">Товар будет выдан именно на этот ник. Проверьте написание.</div>
+
+          <label for="promo">Промокод:</label>
+          <div class="promo-row">
+            <input id="promo" autocomplete="off" placeholder="Если есть" spellcheck="false">
+            <button type="button" class="soft" id="promoBtn">Применить</button>
+          </div>
+          <div class="promo-msg" id="promoMsg"></div>
+
+          <label>Способ оплаты:</label>
+          <div class="methods" id="methods"></div>
+        </div>
+
+        <div class="box summary">
+          <h3>Оформление платежа</h3>
+          <div class="line"><span>Стоимость товаров:</span><span id="sSub"></span></div>
+          <div class="line" id="sDiscRow" hidden><span>Скидка <b id="sPromo"></b>:</span><span id="sDisc" class="green"></span></div>
+          <div class="line total"><span>К оплате:</span><span id="sTotal"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-foot" id="sheetFoot">
+      <div class="consents">
+        <label class="consent" for="consentPd">
+          <input type="checkbox" id="consentPd" required>
+          <span>Я даю <a href="https://telegra.ph/Politika-konfidencialnosti-08-01-83" target="_blank" rel="noopener noreferrer">согласие на обработку персональных данных</a> (Email) в целях оформления заказа, выдачи цифрового товара и отправки чека в соответствии с <a href="https://telegra.ph/Politika-konfidencialnosti-08-01-83" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a></span>
+        </label>
+        <label class="consent" for="consentTerms">
+          <input type="checkbox" id="consentTerms" required>
+          <span>Я принимаю условия <a href="https://telegra.ph/Polzovatelskoe-soglashenie-08-01-39" target="_blank" rel="noopener noreferrer">Пользовательского соглашения</a> (публичной оферты)</span>
+        </label>
+      </div>
+      <div class="err" id="mErr"></div>
+      <button type="button" class="pay" id="mPay" disabled>Оплатить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/app.js"></script>
+<script>
+document.querySelectorAll('.ip-chip').forEach(function(b){b.addEventListener('click',function(){
+  var ip=b.dataset.ip;
+  function done(){b.classList.add('copied');setTimeout(function(){b.classList.remove('copied')},1500)}
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(ip).then(done,fallback)}else fallback();
+  function fallback(){var t=document.createElement('textarea');t.value=ip;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(e){}t.remove();done()}
+})});
+</script>
+</body>
+</html>

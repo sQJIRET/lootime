@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Админка</title>
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="admin">
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img class="logo" src="/img/logo.png" alt="">Админка <span>●</span></a>
+    <nav id="nav" hidden>
+      <a href="#" data-tab="products">Товары</a>
+      <a href="#" data-tab="orders">Заказы</a>
+      <a href="#" data-tab="tickets">Тикеты <span class="badge" id="tBadge" hidden></span></a>
+      <a href="#" data-tab="settings">Настройки</a>
+      <a href="#" id="logout">Выйти</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- вход -->
+  <section id="login" hidden style="max-width:360px;margin:60px auto">
+    <h2>Вход</h2>
+    <label for="pw">Пароль администратора</label>
+    <input id="pw" type="password" autocomplete="current-password">
+    <div style="margin-top:14px"><button id="loginBtn">Войти</button></div>
+    <div class="err" id="loginErr"></div>
+  </section>
+
+  <!-- товары -->
+  <section id="tab-products" hidden>
+    <div class="stats" id="stats"></div>
+    <div class="bar">
+      <h2 style="margin:0">Товары</h2>
+      <button class="sp" id="addProduct">+ Новый товар</button>
+    </div>
+    <div class="tbl-wrap"><table id="productsTbl"></table></div>
+  </section>
+
+  <!-- заказы -->
+  <section id="tab-orders" hidden>
+    <div class="bar">
+      <h2 style="margin:0">Заказы</h2>
+      <select id="fStatus" style="width:auto">
+        <option value="">Все статусы</option>
+        <option value="paid">Оплачены</option>
+        <option value="pending">Ожидают оплаты</option>
+        <option value="review">На проверке</option>
+        <option value="canceled">Отменены</option>
+      </select>
+      <input id="fQuery" placeholder="Ник или номер заказа" style="width:220px">
+      <button class="ghost" id="fGo">Найти</button>
+    </div>
+    <div class="tbl-wrap"><table id="ordersTbl"></table></div>
+  </section>
+
+  <!-- тикеты -->
+  <section id="tab-tickets" hidden>
+    <div class="bar">
+      <h2 style="margin:0">Тикеты</h2>
+      <select id="tStatusF" style="width:auto">
+        <option value="">Все статусы</option>
+        <option value="open">Ждут ответа</option>
+        <option value="answered">Есть ответ</option>
+        <option value="closed">Закрыты</option>
+      </select>
+      <input id="tQuery" placeholder="Ник, номер, тема, email" style="width:220px">
+      <button class="ghost" id="tGo">Найти</button>
+    </div>
+    <div class="tbl-wrap"><table id="ticketsTbl"></table></div>
+  </section>
+
+  <!-- настройки -->
+  <section id="tab-settings" hidden style="max-width:640px">
+    <h2>Настройки сайта</h2>
+    <div id="settingsForm"></div>
+    <div style="margin-top:16px"><button id="saveSettings">Сохранить</button> <span id="settingsMsg" class="hint"></span></div>
+  </section>
+</main>
+
+<!-- обращение -->
+<div class="modal-bg" id="tkBg">
+  <div class="modal" style="max-width:680px">
+    <div class="tk-head">
+      <div><h2 id="tkTitle" style="margin:0"></h2><div class="hint" id="tkMeta"></div></div>
+      <span class="pill" id="tkPill"></span>
+    </div>
+    <div class="hint" id="tkOrder"></div>
+    <div class="tk-thread" id="tkThread" style="max-height:340px;overflow:auto;margin-top:12px"></div>
+    <textarea id="tkReply" maxlength="4000" placeholder="Ответ игроку" style="min-height:90px"></textarea>
+    <div class="err" id="tkErr"></div>
+    <div class="tk-actions">
+      <button id="tkSend">Ответить</button>
+      <button class="ghost" id="tkSendClose">Ответить и закрыть</button>
+    </div>
+    <div class="tk-actions" style="margin-top:8px">
+      <button class="ghost mini" id="tkToggle"></button>
+      <button class="danger mini" id="tkDelete">Удалить</button>
+      <button class="ghost mini" id="tkCancel">Закрыть окно</button>
+    </div>
+  </div>
+</div>
+
+<!-- форма товара -->
+<div class="modal-bg" id="pBg">
+  <div class="modal" style="max-width:560px">
+    <h2 id="pTitle">Товар</h2>
+    <label>Название</label><input id="pName" maxlength="100">
+    <label>Описание</label><textarea id="pDesc" style="min-height:70px"></textarea>
+    <div class="row">
+      <div><label>Категория</label><input id="pCat" placeholder="Привилегии" list="catList"><datalist id="catList"><option value="Привилегии"><option value="Кейсы"><option value="Валюта"><option value="Другое"></datalist></div>
+      <div><label>Цена, ₽</label><input id="pPrice" type="number" min="1" step="0.01"></div>
+    </div>
+    <label>Ссылка на картинку (необязательно)</label><input id="pImg" placeholder="https://…">
+    <label class="chk"><input type="checkbox" id="pQty"> Игрок сам выбирает количество (цена умножается)</label>
+    <div class="row" id="pQtyRow">
+      <div><label>Минимум</label><input id="pQMin" type="number" min="1" value="1"></div>
+      <div><label>Максимум</label><input id="pQMax" type="number" min="1" value="100"></div>
+      <div><label>Цена за N шт.</label><input id="pPer" type="number" min="1" value="1" title="Токены: 1000 (цена 1 ₽ за 1000)"></div>
+    </div>
+    <label>Команды выдачи (по одной в строке, без /)</label>
+    <textarea id="pCmds" placeholder="lp user {player} parent add vip&#10;eco give {player} 1000"></textarea>
+    <div class="hint">Подставляются: <code>{player}</code> — ник игрока, <code>{qty}</code> — количество. Команды выполняются от имени консоли сервера.</div>
+    <label class="chk"><input type="checkbox" id="pOnline"> Выдавать только когда игрок онлайн (иначе выдастся сразу)</label>
+    <div class="row">
+      <div><label>Порядок (меньше = выше)</label><input id="pSort" type="number" value="0"></div>
+      <div><label class="chk" style="margin-top:36px"><input type="checkbox" id="pActive" checked> Показывать на сайте</label></div>
+    </div>
+    <div class="row" style="margin-top:18px">
+      <button class="ghost" id="pCancel">Отмена</button>
+      <button id="pSave">Сохранить</button>
+    </div>
+    <div class="err" id="pErr"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 }).format(n) + ' ₽';
+  function el(tag, props = {}, ...kids) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === 'class') e.className = v;
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v);
+    }
+    for (const kid of kids) e.append(kid);
+    return e;
+  }
+  async function api(path, method = 'GET', body) {
+    const r = await fetch(path, {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : {},
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await r.json().catch(() => ({}));
+    if (r.status === 401 && path !== '/api/admin/login') { showLogin(); throw new Error('Требуется вход'); }
+    if (!r.ok) throw new Error(data.error || 'Ошибка ' + r.status);
+    return data;
+  }
+
+  const tabs = ['products', 'orders', 'tickets', 'settings'];
+  function showTab(name) {
+    for (const t of tabs) $('tab-' + t).hidden = t !== name;
+    if (name === 'products') loadProducts();
+    if (name === 'orders') loadOrders();
+    if (name === 'tickets') loadTickets();
+    if (name === 'settings') loadSettings();
+  }
+  function showLogin() {
+    $('login').hidden = false; $('nav').hidden = true;
+    for (const t of tabs) $('tab-' + t).hidden = true;
+  }
+
+  // ---- вход
+  async function login() {
+    $('loginErr').textContent = '';
+    try {
+      await api('/api/admin/login', 'POST', { password: $('pw').value });
+      $('pw').value = '';
+      start();
+    } catch (e) { $('loginErr').textContent = e.message; }
+  }
+  $('loginBtn').onclick = login;
+  $('pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+  $('logout').onclick = async (e) => { e.preventDefault(); await api('/api/admin/logout', 'POST', {}); showLogin(); };
+  document.querySelectorAll('#nav [data-tab]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); showTab(a.dataset.tab); }));
+
+  // ---- товары
+  let products = [];
+  async function loadProducts() {
+    const [list, st] = await Promise.all([api('/api/admin/products'), api('/api/admin/stats')]);
+    products = list;
+    const stats = $('stats');
+    stats.replaceChildren(
+      ...[[fmt(st.revenue), 'Выручка'], [st.paid_orders, 'Оплаченных заказов'], [st.undelivered, 'Команд ждут выдачи']].map(([v, l]) =>
+        el('div', { class: 'stat' }, el('b', {}, String(v)), el('span', {}, l))),
+    );
+    const t = $('productsTbl');
+    t.replaceChildren(
+      el('tr', {}, ...['Название', 'Категория', 'Цена', 'Команды', 'Статус', ''].map((h) => el('th', {}, h))),
+      ...products.map((p) => el('tr', {},
+        el('td', {}, p.name),
+        el('td', {}, p.category),
+        el('td', {}, fmt(p.price) + (p.allow_qty ? (p.price_per > 1 ? ' за ' + p.price_per + ' шт.' : ' /шт.') : '')),
+        el('td', {}, p.commands.join('\n')),
+        el('td', {}, el('span', { class: 'pill ' + (p.active ? 'paid' : 'canceled') }, p.active ? 'на сайте' : 'скрыт')),
+        el('td', {},
+          el('button', { class: 'ghost mini', onclick: () => editProduct(p) }, 'Изменить'), ' ',
+          el('button', { class: 'danger mini', onclick: () => delProduct(p) }, 'Удалить')),
+      )),
+    );
+    t.querySelectorAll('td:nth-child(4)').forEach((c) => (c.style.whiteSpace = 'pre-line'));
+  }
+
+  let editingId = null;
+  function editProduct(p) {
+    editingId = p ? p.id : null;
+    $('pTitle').textContent = p ? 'Изменить товар' : 'Новый товар';
+    $('pName').value = p?.name ?? '';
+    $('pDesc').value = p?.description ?? '';
+    $('pCat').value = p?.category ?? '';
+    $('pPrice').value = p?.price ?? '';
+    $('pImg').value = p?.image_url ?? '';
+    $('pQty').checked = p?.allow_qty ?? false;
+    $('pQMin').value = p?.qty_min ?? 1;
+    $('pQMax').value = p?.qty_max ?? 100;
+    $('pPer').value = p?.price_per ?? 1;
+    $('pCmds').value = (p?.commands ?? []).join('\n');
+    $('pOnline').checked = p?.online_only ?? false;
+    $('pSort').value = p?.sort ?? 0;
+    $('pActive').checked = p?.active ?? true;
+    $('pErr').textContent = '';
+    toggleQty();
+    $('pBg').classList.add('show');
+  }
+  function toggleQty() { $('pQtyRow').style.display = $('pQty').checked ? '' : 'none'; }
+  $('pQty').onchange = toggleQty;
+  $('addProduct').onclick = () => editProduct(null);
+  $('pCancel').onclick = () => $('pBg').classList.remove('show');
+  $('pSave').onclick = async () => {
+    const body = {
+      name: $('pName').value, description: $('pDesc').value, category: $('pCat').value,
+      price: $('pPrice').value, image_url: $('pImg').value, allow_qty: $('pQty').checked,
+      qty_min: $('pQMin').value, qty_max: $('pQMax').value, price_per: $('pPer').value, commands: $('pCmds').value,
+      online_only: $('pOnline').checked, sort: $('pSort').value, active: $('pActive').checked,
+    };
+    try {
+      if (editingId) await api('/api/admin/products/' + editingId, 'PUT', body);
+      else await api('/api/admin/products', 'POST', body);
+      $('pBg').classList.remove('show');
+      loadProducts();
+    } catch (e) { $('pErr').textContent = e.message; }
+  };
+  async function delProduct(p) {
+    if (!confirm(`Удалить «${p.name}»? Если по товару были заказы, он будет просто скрыт.`)) return;
+    await api('/api/admin/products/' + p.id, 'DELETE');
+    loadProducts();
+  }
+
+  // ---- заказы
+  const STATUS = { paid: 'оплачен', pending: 'ждёт оплаты', review: 'на проверке', canceled: 'отменён' };
+  async function loadOrders() {
+    const qs = new URLSearchParams({ status: $('fStatus').value, q: $('fQuery').value });
+    const rows = await api('/api/admin/orders?' + qs);
+    const t = $('ordersTbl');
+    t.replaceChildren(
+      el('tr', {}, ...['Дата', 'Ник', 'Товар', 'Сумма', 'Статус', 'Выдача', ''].map((h) => el('th', {}, h))),
+      ...rows.map((o) => {
+        const delivery = o.d_total ? `${o.d_done}/${o.d_total}` + (o.d_error ? ' ⚠ ' + o.d_error : '') : '—';
+        const acts = [];
+        if (o.status !== 'paid') acts.push(el('button', { class: 'mini', onclick: () => grant(o) }, 'Выдать вручную'));
+        if (o.d_total) acts.push(el('button', { class: 'ghost mini', onclick: () => redeliver(o) }, 'Повторить'));
+        return el('tr', {},
+          el('td', {}, new Date(o.created_at).toLocaleString('ru-RU')),
+          el('td', {}, o.nick),
+          el('td', {}, o.product_name + (o.qty > 1 ? ' ×' + o.qty : '')),
+          el('td', {}, fmt(o.amount)),
+          el('td', {}, el('span', { class: 'pill ' + o.status }, STATUS[o.status] || o.status), o.note ? el('div', { class: 'hint' }, o.note) : ''),
+          el('td', {}, delivery),
+          el('td', {}, ...acts.flatMap((a) => [a, ' '])),
+        );
+      }),
+    );
+  }
+  $('fGo').onclick = loadOrders;
+  $('fQuery').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadOrders(); });
+  $('fStatus').onchange = loadOrders;
+  async function grant(o) {
+    if (!confirm(`Выдать «${o.product_name}» игроку ${o.nick} без проверки оплаты?`)) return;
+    await api(`/api/admin/orders/${o.id}/grant`, 'POST', {});
+    loadOrders();
+  }
+  async function redeliver(o) {
+    if (!confirm(`Повторно выполнить команды заказа для ${o.nick}? Игрок получит товар ещё раз.`)) return;
+    await api(`/api/admin/orders/${o.id}/redeliver`, 'POST', {});
+    loadOrders();
+  }
+
+  // ---- тикеты
+  const TSTATUS = { open: 'ждёт ответа', answered: 'есть ответ', closed: 'закрыт' };
+  const dt = (t) => new Date(t).toLocaleString('ru-RU', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  async function refreshBadge() {
+    try {
+      const st = await api('/api/admin/stats');
+      const b = $('tBadge');
+      b.textContent = st.open_tickets;
+      b.hidden = !st.open_tickets;
+    } catch (e) { /* не вошли */ }
+  }
+  async function loadTickets() {
+    const qs = new URLSearchParams({ status: $('tStatusF').value, q: $('tQuery').value });
+    const rows = await api('/api/admin/tickets?' + qs);
+    const t = $('ticketsTbl');
+    t.replaceChildren(
+      el('tr', {}, ...['№', 'Обновлено', 'Ник', 'Тема', 'Категория', 'Сообщ.', 'Статус'].map((h) => el('th', {}, h))),
+      ...rows.map((r) => {
+        const tr = el('tr', { style: 'cursor:pointer', onclick: () => openTicket(r.id) },
+          el('td', {}, r.id), el('td', {}, dt(r.updated_at)), el('td', {}, r.nick),
+          el('td', {}, r.subject), el('td', {}, r.category_name), el('td', {}, String(r.messages)),
+          el('td', {}, el('span', { class: 'pill ' + r.status }, TSTATUS[r.status])));
+        return tr;
+      }),
+    );
+    if (!rows.length) t.append(el('tr', {}, el('td', { colspan: '7', class: 'hint' }, 'Обращений нет')));
+    refreshBadge();
+  }
+  $('tGo').onclick = loadTickets;
+  $('tStatusF').onchange = loadTickets;
+  $('tQuery').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadTickets(); });
+
+  let curTicket = null;
+  async function openTicket(id) {
+    const t = await api('/api/admin/tickets/' + encodeURIComponent(id));
+    curTicket = t;
+    $('tkTitle').textContent = t.subject;
+    $('tkMeta').textContent = '№ ' + t.id + ' · ' + t.nick + ' · ' + t.email + ' · ' + t.category_name + ' · ' + dt(t.created_at);
+    $('tkOrder').textContent = t.order
+      ? `Заказ ${t.order.id}: ${t.order.product_name}${t.order.qty > 1 ? ' ×' + t.order.qty : ''}, ${fmt(t.order.amount)}, ${STATUS[t.order.status] || t.order.status}`
+      : (t.order_id ? 'Заказ ' + t.order_id + ' (удалён)' : '');
+    const pill = $('tkPill'); pill.className = 'pill ' + t.status; pill.textContent = TSTATUS[t.status];
+    $('tkThread').replaceChildren(...t.messages.map((m) => el('div', { class: 'tk-msg ' + m.author },
+      el('div', { class: 'tk-who' }, m.author === 'admin' ? 'Поддержка' : t.nick, el('span', {}, ' · ' + dt(m.created_at))),
+      el('div', { class: 'tk-body' }, m.body))));
+    $('tkToggle').textContent = t.status === 'closed' ? 'Открыть заново' : 'Закрыть без ответа';
+    $('tkReply').value = ''; $('tkErr').textContent = '';
+    $('tkBg').classList.add('show');
+    const th = $('tkThread'); th.scrollTop = th.scrollHeight;
+  }
+  async function sendTicket(close) {
+    $('tkErr').textContent = '';
+    try {
+      await api(`/api/admin/tickets/${curTicket.id}/reply`, 'POST', { message: $('tkReply').value, close });
+      if (close) { $('tkBg').classList.remove('show'); loadTickets(); } else { await openTicket(curTicket.id); loadTickets(); }
+    } catch (e) { $('tkErr').textContent = e.message; }
+  }
+  $('tkSend').onclick = () => sendTicket(false);
+  $('tkSendClose').onclick = () => sendTicket(true);
+  $('tkCancel').onclick = () => $('tkBg').classList.remove('show');
+  $('tkToggle').onclick = async () => {
+    await api(`/api/admin/tickets/${curTicket.id}/status`, 'POST', { status: curTicket.status === 'closed' ? 'open' : 'closed' });
+    $('tkBg').classList.remove('show'); loadTickets();
+  };
+  $('tkDelete').onclick = async () => {
+    if (!confirm(`Удалить обращение ${curTicket.id} вместе с перепиской? Это нельзя отменить.`)) return;
+    await api('/api/admin/tickets/' + curTicket.id, 'DELETE');
+    $('tkBg').classList.remove('show'); loadTickets();
+  };
+  setInterval(() => { if (!$('nav').hidden && !document.hidden) refreshBadge(); }, 60000);
+
+  // ---- настройки
+  const FIELDS = [
+    ['shop_name', 'Название сервера', 'input'], ['tagline', 'Подзаголовок на главной', 'input'],
+    ['server_ip', 'IP сервера (показывается на главной)', 'input'],
+    ['telegram', 'Ссылка на Telegram', 'input'], ['discord', 'Ссылка на Discord', 'input'],
+    ['youtube', 'Ссылка на YouTube', 'input'], ['tiktok', 'Ссылка на TikTok (с https://)', 'input'],
+    ['refund_info', 'Текст в подвале (выдача, поддержка)', 'textarea'],
+    ['rules', 'Правила сервера', 'textarea'],
+  ];
+  async function loadSettings() {
+    const s = await api('/api/admin/settings');
+    const f = $('settingsForm');
+    f.replaceChildren(...FIELDS.flatMap(([k, label, kind]) => {
+      const inp = el(kind, { id: 's_' + k });
+      if (kind === 'textarea' && k === 'rules') inp.style.minHeight = '220px';
+      inp.value = s[k] ?? '';
+      return [el('label', {}, label), inp];
+    }));
+  }
+  $('saveSettings').onclick = async () => {
+    const body = {};
+    for (const [k] of FIELDS) body[k] = $('s_' + k).value;
+    await api('/api/admin/settings', 'PUT', body);
+    $('settingsMsg').textContent = 'Сохранено';
+    setTimeout(() => ($('settingsMsg').textContent = ''), 2000);
+  };
+
+  async function start() {
+    $('login').hidden = true; $('nav').hidden = false;
+    showTab('products');
+    refreshBadge();
+  }
+  api('/api/admin/me').then((r) => (r.admin ? start() : showLogin()));
+})();
+</script>
+</body>
+</html>
